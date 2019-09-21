@@ -7,6 +7,10 @@ nonparametric fitting (See [Cattaneo, Crump, Farrell, and Feng](https://arxiv.or
 - Uses Pythonic plotting capabilities like `seaborn` 
 - Mimicks `seaborn.regplot` in usage 
 
+## Installation
+
+`pip install git+https://github.com/jiafengkevinchen/binscatterplot`
+
 
 ## Minimal working example
 
