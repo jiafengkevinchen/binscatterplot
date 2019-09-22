@@ -14,7 +14,7 @@ nonparametric fitting (See [Cattaneo, Crump, Farrell, and Feng](https://arxiv.or
 
 ## Minimal working example
 
-![image](https://user-images.githubusercontent.com/24930289/65379164-aea61780-dc91-11e9-9d0b-f497d0d917ca.png)
+![image](https://user-images.githubusercontent.com/24930289/65380840-4287db80-dcb2-11e9-8043-9d5331e75923.png)
 
 ## Documentation
 

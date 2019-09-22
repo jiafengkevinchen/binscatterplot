@@ -297,7 +297,7 @@ def binscatterplot(
         cb = (3, 3)
 
     if disp_ci:
-        ci = (3, 3)
+        ci = (0, 0)
 
     if fit_reg:
         kwargs["polyreg"] = 1
