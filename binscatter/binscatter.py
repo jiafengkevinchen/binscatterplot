@@ -18,6 +18,7 @@ binsreg = importr("binsreg")
 
 
 def unwrap(robject, depth=1):
+
     if depth == 0:
         return robject
     else:
@@ -37,7 +38,7 @@ def binsreg_data(
     cb: tuple = rpy2.rinterface.NULL,
     nbins: int = rpy2.rinterface.NULL,
     **kwargs,
-):
+) -> dict:
 
     if type(w) is not rpy2.rinterface.NULLType and w.ndim == 1:
         w = w.reshape((-1, 1))
@@ -229,11 +230,7 @@ class _BinnedRegressionPlotter(_LinearPlotter):
                         residual_proj @ self.y.values[self.hue == grp[6:]]
                         + self.y.values[self.hue == grp[6:]].mean()
                     )
-                    ax.scatter(
-                        res_x, res_y,
-                        alpha=0.1,
-                        marker=".",
-                    )
+                    ax.scatter(res_x, res_y, alpha=0.1, marker=".")
                 else:
                     ax.scatter(
                         self.x[self.hue == grp[6:]].values,
@@ -281,17 +278,17 @@ def binscatterplot(
     ci: tuple = rpy2.rinterface.NULL,
     cb: tuple = rpy2.rinterface.NULL,
     nbins: int = rpy2.rinterface.NULL,
-    ax=None,
-    color=None,
-    truncate=False,
-    legend_args=dict(frameon=False),
-    scatter_args=dict(),
-    line_args=dict(),
-    poly_args=dict(),
-    ci_args=dict(),
+    ax: plt.Axes = None,
+    color: str = None,
+    truncate: bool = False,
+    legend_args: dict = dict(frameon=False),
+    scatter_args: dict = dict(),
+    line_args: dict = dict(),
+    poly_args: dict = dict(),
+    ci_args: dict = dict(),
     raw: bool = True,
     **kwargs,
-):
+) -> plt.Axes:
     if ax is None:
         ax = plt.gca()
 
@@ -332,3 +329,74 @@ def binscatterplot(
     )
 
     return ax
+
+
+binscatterplot.__doc__ = f"""\
+Plot data via binned scatterplot.
+
+See https://arxiv.org/pdf/1902.09608.pdf for details.
+Site and documentation for binsreg: https://sites.google.com/site/nppackages/binsreg/.
+
+Parameters
+----------
+x : Union[str, np.array]
+    Independent variable
+y : Union[str, np.array]
+    Dependent variable
+covariates : Union[str, List], optional
+    List of additional covariates to control for, by default None
+hue : Union[str, np.array], optional
+    Variable for groupings of data, by default None
+fit_spline : bool, optional
+    Equivalent to setting line=(3, 3) and cb=(3, 3) for fitting cubic splines,
+    If fit_spline is True, line and cb arguments are ignored; by default True
+fit_reg : bool, optional
+    Equivalent to setting polyreg=1. If True, polyreg is ignored, by default False
+disp_ci : bool, optional
+    Equivalent to setting ci=(3, 3). If True, ci is ignored, by default True
+data : pd.DataFrame, optional
+    DataFrame for the data, must be specified if x, y are not iterables, by default None
+raw : bool, optional
+    Whether or not raw data is plotted in the background, by default True.
+    Mean-shifted residualized data is plotted in the presence of additional covariates:
+    The residuals of z (for z being x, y) regressed on intercept and covariates are
+    recentered at the original mean of z (instead of zero) and plotted.
+dots : tuple, optional
+    Argument passed to binsreg in R, by default (0, 0)
+line : tuple, optional
+    Argument passed to binsreg in R, by default rpy2.rinterface.NULL
+ci : tuple, optional
+    Argument passed to binsreg in R, by default rpy2.rinterface.NULL
+cb : tuple, optional
+    Argument passed to binsreg in R, by default rpy2.rinterface.NULL
+nbins : int, optional
+    Argument passed to binsreg in R, by default rpy2.rinterface.NULL
+ax : matplotlib.pyplot.Axes, optional
+    Axes object for the plot, by default None
+color : str, optional
+    Color of the plot, by default None
+truncate : bool, optional
+    Whether to truncate the line fits (spline or global regression) at the
+    left and right most bins, by default False
+legend_args : dict, optional
+    Arguments passed to ax.legend(), by default dict(frameon=False)
+scatter_args : dict, optional
+    Arguments passed to ax.scatter for the binned dots, by default dict()
+line_args : dict, optional
+    Arguments passed to ax.plot for the spline fit, by default dict()
+poly_args : dict, optional
+    Arguments passed to ax.plot for the global regression fit, by default dict()
+ci_args : dict, optional
+    Arguments passed to ax.errorbar for the CI on binned points, by default dict()
+**kwargs:
+    Additional arguments passed to binsreg in R
+
+Returns
+-------
+ax: plt.Axes
+    The Axes for the plot
+
+`binsreg` documentation in R
+----------------------------
+{binsreg.binsreg.__doc__}
+"""
