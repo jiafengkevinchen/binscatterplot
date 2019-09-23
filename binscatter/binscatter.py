@@ -216,40 +216,44 @@ class _BinnedRegressionPlotter(_LinearPlotter):
 
         for grp in self.data_plot:
             if raw:
+
+                x = self.x[self.hue == grp[6:]] if self.hue is not None else self.x
+                x = np.array(x)
+                y = self.y[self.hue == grp[6:]] if self.hue is not None else self.y
+                y = np.array(y)
+
                 if self.covariates is not None:
-                    mat = self.covariates.values[self.hue == grp[6:]]
+                    mat = np.array(
+                        self.covariates[self.hue == grp[6:]]
+                        if self.hue is not None
+                        else self.covariates
+                    )
                     mat = np.hstack([np.ones((mat.shape[0], 1)), mat])
                     residual_proj = (
                         np.eye(mat.shape[0]) - mat @ np.linalg.inv(mat.T @ mat) @ mat.T
                     )
-                    res_x = (
-                        residual_proj @ self.x.values[self.hue == grp[6:]]
-                        + self.x.values[self.hue == grp[6:]].mean()
-                    )
-                    res_y = (
-                        residual_proj @ self.y.values[self.hue == grp[6:]]
-                        + self.y.values[self.hue == grp[6:]].mean()
-                    )
+                    res_x = residual_proj @ x + x.mean()
+                    res_y = residual_proj @ y + y.mean()
                     ax.scatter(res_x, res_y, alpha=0.1, marker=".")
                 else:
-                    ax.scatter(
-                        self.x[self.hue == grp[6:]].values,
-                        self.y[self.hue == grp[6:]].values,
-                        alpha=0.1,
-                        marker=".",
-                    )
+                    ax.scatter(x, y, alpha=0.1, marker=".")
+
+            if len(self.data_plot) > 1:
+                label = grp[6:]
+            else:
+                label = None
             binsplot(
                 self.data_plot[grp],
                 ax=ax,
                 truncate=truncate,
-                label=grp[6:],
+                label=label,
                 scatter_args=scatter_args,
                 line_args=line_args,
                 poly_args=poly_args,
                 ci_args=ci_args,
             )
-
-        ax.legend(**legend_args)
+        if len(self.data_plot) > 1:
+            ax.legend(**legend_args)
 
         # Label the axes
         if hasattr(self.x, "name"):
