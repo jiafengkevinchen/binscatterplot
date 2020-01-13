@@ -96,6 +96,12 @@ def binsplot(
     dots = data_dict["data.dots"]
     sc = ax.scatter(dots["x"], dots["fit"], color=color, label=label, **scatter_args)
 
+    y_min = dots["fit"].min()
+    y_max = dots["fit"].max()
+
+    x_min = dots["x"].min()
+    x_max = dots["x"].max()
+
     if "data.ci" in data_dict:
         ci = data_dict["data.ci"]
         ax.errorbar(
@@ -109,6 +115,15 @@ def binsplot(
             capsize=2,
             color=color,
             **ci_args,
+        )
+
+        y_min = min(
+            y_min,
+            ci.loc[(ci["x"] < x_max) & (ci["x"] > x_min), ["ci.l", "ci.r"]].min().min(),
+        )
+        y_max = max(
+            y_max,
+            ci.loc[(ci["x"] < x_max) & (ci["x"] > x_min), ["ci.l", "ci.r"]].max().max(),
         )
 
     if "data.line" in data_dict:
@@ -132,6 +147,14 @@ def binsplot(
             cb["cb.r"].values,
             color=color,
             alpha=0.15,
+        )
+        y_min = min(
+            y_min,
+            cb.loc[(cb["x"] < x_max) & (cb["x"] > x_min), ["cb.l", "cb.r"]].min().min(),
+        )
+        y_max = max(
+            y_max,
+            cb.loc[(cb["x"] < x_max) & (cb["x"] > x_min), ["cb.l", "cb.r"]].max().max(),
         )
 
     if "data.poly" in data_dict:
@@ -157,6 +180,11 @@ def binsplot(
             color=color,
             alpha=0.15,
         )
+
+    y_room = (y_max - y_min) * 0.1
+    x_room = (x_max - x_min) * 0.1
+    ax.set_ylim(bottom=y_min - y_room, top=y_max + y_room)
+    ax.set_xlim(left=x_min - x_room, right=x_max + x_room)
     return ax
 
 

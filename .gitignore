@@ -1,3 +1,5 @@
 __pycache__*
 Dockerfile*
 *.ipynb
+.ipynb_checkpoints*
+.vscode*
